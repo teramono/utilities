@@ -1,4 +1,4 @@
-package init
+package setup
 
 import (
 	"fmt"
@@ -22,7 +22,8 @@ func NewSetup() (Setup, error) {
 
 	// ...
 	connectionURI := os.Getenv("WORKSPACES_CONNECTION_URI")
-	if connectionURI != "" {
+	fmt.Println("connection", connectionURI)
+	if connectionURI == "" {
 		return Setup{}, fmt.Errorf("???")
 	}
 
