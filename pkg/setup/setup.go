@@ -16,23 +16,25 @@ type Setup struct {
 }
 
 // NewSetup ...
-func NewSetup() (Setup, error) {
+func NewSetup(enableDatabase bool) (Setup, error) {
 	// ...
 	godotenv.Load()
 
 	// ...
-	connectionURI := os.Getenv("WORKSPACES_CONNECTION_URI")
-	fmt.Println("connection", connectionURI)
-	if connectionURI == "" {
-		return Setup{}, fmt.Errorf("???")
+	var db database.DB
+	var err error
+	if enableDatabase {
+		connectionURI := os.Getenv("WORKSPACES_CONNECTION_URI")
+		if connectionURI == "" {
+			return Setup{}, fmt.Errorf("Could not connect!")
+		}
+
+		// ...
+		db, err = database.Connect(connectionURI)
+		if err != nil {
+			return Setup{}, err
+		}
 	}
 
-	// ...
-	db, err := database.Connect(connectionURI)
-	if err != nil {
-		return Setup{}, err
-	}
-
-	return Setup{WorkspacesDB: db}, err
+	return Setup{WorkspacesDB: db}, nil
 }
-
