@@ -1,7 +1,11 @@
 package request
 
 import (
+	"bytes"
 	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,4 +53,24 @@ func NewRequestFromContext(ctx *gin.Context) (Request, error) {
 		Method:  method,
 		Headers: headers,
 	}, nil
+}
+
+func (req *Request) Send() (*http.Response, error) {
+	// Http client with 10s timeout.
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+
+	// Construct a new request.
+	newReq, err := http.NewRequest(req.Method, req.URL.Host+req.URL.URI, bytes.NewReader(req.Body))
+	if err != nil {
+		return nil, err
+	}
+
+	// Set headers.
+	for key, value := range req.Headers {
+		newReq.Header.Set(key, strings.Join(value, ","))
+	}
+
+	return client.Do(newReq)
 }
