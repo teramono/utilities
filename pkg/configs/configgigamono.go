@@ -8,6 +8,7 @@ import (
 
 // GigamonoConfig ...
 type GigamonoConfig struct {
+	Meta Meta `json:"meta"`
 }
 
 // NewGigamonoConfig ...
