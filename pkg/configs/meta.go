@@ -1,6 +1,6 @@
 package configs
 
 type Meta struct {
-	Name    string `json:"name"`
+	Type    string `json:"type"`
 	Version uint   `json:"version"`
 }

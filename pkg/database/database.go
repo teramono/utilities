@@ -5,13 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// DB ...
 type DB struct {
 	*gorm.DB
 }
 
-// Connect ...
-func Connect(connectionURI string) (DB, error) {
+func ConnectDB(connectionURI string) (DB, error) {
 	db, err := gorm.Open(sqlite.Open(connectionURI), &gorm.Config{})
 	if err != nil {
 		return DB{}, err

@@ -7,12 +7,8 @@ CREATE TABLE workspaces (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL UNIQUE
 );
-
 CREATE UNIQUE INDEX idx_workspaces_name ON workspaces(name);
-
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
 DROP INDEX idx_workspaces_name;
-
 DROP TABLE workspaces;
-
