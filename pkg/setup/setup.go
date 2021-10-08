@@ -1,32 +1,46 @@
 package setup
 
 import (
+	"log"
+
+	"github.com/teramono/utilities/pkg/broker"
 	"github.com/teramono/utilities/pkg/configs"
 	"github.com/teramono/utilities/pkg/database"
+	"github.com/teramono/utilities/pkg/logs"
 )
 
 type CommonSetup struct {
+	broker.BrokerClient
 	Config configs.GigamonoConfig
 }
 
 type APIEngineSetup struct {
 	CommonSetup
-	WorkspacesDB database.DB
-}
-
-type SupervisorEngineSetup struct {
-	CommonSetup
-	ProcessesDB database.DB
+	DB database.DB
 }
 
 func NewCommonSetup() (CommonSetup, error) {
-	// Load Gigamono config file.
+	// Load gigamono config file.
 	config, err := configs.LoadGigamonoConfig()
+	if err != nil {
+		log.Printf("unable to load config: %v", err)
+	}
+
+	// Set log file.
+	if err = logs.SetLogFile(config.Logs.File); err != nil {
+		log.Println(err)
+	}
+
+	// Connect to broker server.
+	brokerClient, err := broker.NewBrokerClient(config.Broker.URL)
 	if err != nil {
 		return CommonSetup{}, err
 	}
 
-	return CommonSetup{Config: config}, nil
+	return CommonSetup{
+		BrokerClient: brokerClient,
+		Config:       config,
+	}, nil
 }
 
 func NewAPIEngineSetup() (APIEngineSetup, error) {
@@ -35,30 +49,13 @@ func NewAPIEngineSetup() (APIEngineSetup, error) {
 		return APIEngineSetup{}, err
 	}
 
-	db, err := database.ConnectDB(commonSetup.Config.Engines.API.WorkspacesDBURI)
+	db, err := database.ConnectDB(commonSetup.Config.Engines.API.DBURL)
 	if err != nil {
 		return APIEngineSetup{}, err
 	}
 
 	return APIEngineSetup{
-		CommonSetup:  commonSetup,
-		WorkspacesDB: db,
-	}, nil
-}
-
-func NewProvisionEngineSetup() (SupervisorEngineSetup, error) {
-	commonSetup, err := NewCommonSetup()
-	if err != nil {
-		return SupervisorEngineSetup{}, err
-	}
-
-	db, err := database.ConnectDB(commonSetup.Config.Engines.Provision.ProvisionsDBURI)
-	if err != nil {
-		return SupervisorEngineSetup{}, err
-	}
-
-	return SupervisorEngineSetup{
-		CommonSetup:  commonSetup,
-		ProcessesDB: db,
+		CommonSetup: commonSetup,
+		DB:          db,
 	}, nil
 }
