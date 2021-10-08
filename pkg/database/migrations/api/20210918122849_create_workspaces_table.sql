@@ -4,7 +4,7 @@ CREATE TABLE workspaces (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT, -- TODO: Use UUID
     name VARCHAR(255) NOT NULL UNIQUE
 );
 CREATE UNIQUE INDEX idx_workspaces_name ON workspaces(name);
