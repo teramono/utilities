@@ -49,6 +49,7 @@ func NewAPIEngineSetup() (APIEngineSetup, error) {
 		return APIEngineSetup{}, err
 	}
 
+	// Connect to api.db.
 	db, err := database.ConnectDB(commonSetup.Config.Engines.API.DBURL)
 	if err != nil {
 		return APIEngineSetup{}, err

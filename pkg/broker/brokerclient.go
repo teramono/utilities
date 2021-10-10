@@ -16,3 +16,7 @@ func NewBrokerClient(url string) (BrokerClient, error) {
 
 	return BrokerClient{natsConn}, nil
 }
+
+func (broker *BrokerClient) Close() {
+	broker.Conn.Close()
+}

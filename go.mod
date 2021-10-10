@@ -3,6 +3,7 @@ module github.com/teramono/utilities
 go 1.16
 
 require (
+	github.com/gin-contrib/location v0.0.2
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/nats-io/nats-server/v2 v2.6.1 // indirect
