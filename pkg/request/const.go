@@ -1,8 +1,8 @@
 package request
 
 const (
-	WorkspaceNameHeader = "X-GG-WORKSPACE-NAME"
-	WorkspaceIDHeader   = "X-GG-WORKSPACE-ID"
-	UserTokenHeader     = "X-GG-USER-TOKEN"
+	WorkspaceNameHeader = "X-Gg-workspace-Name"
+	WorkspaceIDHeader   = "X-Gg-Workspace-Id"
+	UserTokenHeader     = "X-Gg-User-Token"
 	AuthorizationHeader = "Authorization"
 )

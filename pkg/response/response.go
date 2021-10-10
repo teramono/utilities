@@ -1,6 +1,7 @@
 package response
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,4 +33,20 @@ func SetServerErrorResponse(ctx *gin.Context, errorMessages ...messages.ErrorMes
 	ctx.JSON(http.StatusInternalServerError, gin.H{
 		"errors": errorMessages,
 	})
+}
+
+func CreateErrorResponseBody(errorMessages ...messages.ErrorMessage) map[string][]messages.ErrorMessage {
+	return map[string][]messages.ErrorMessage{
+		"errors": errorMessages,
+	}
+}
+
+func CreateErrorResponseBodyBytes(errorMessages ...messages.ErrorMessage) ([]byte, error) {
+	body := CreateErrorResponseBody(errorMessages...)
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return bodyBytes, nil
 }
