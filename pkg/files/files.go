@@ -1,4 +1,4 @@
-package file
+package files
 
 import (
 	"os"
@@ -28,15 +28,4 @@ func OpenOrCreateFile(path string, isAppend bool) (*os.File, error) {
 func CreateFolderIfNotExist(path string) error {
 	// Had to pass 0777 here. https://stackoverflow.com/a/58403214/3984876
 	return os.MkdirAll(path, 0777)
-}
-
-// ReadFile ...
-func ReadFile(path string) ([]byte, error) {
-	return os.ReadFile(path)
-}
-
-// Canonicalize ...
-func Canonicalize(path string, canonicalPWD string) string {
-	// TODO: SEC: Harden!
-	return ""
 }
