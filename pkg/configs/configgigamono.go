@@ -5,54 +5,63 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
-
-	"github.com/spf13/viper"
 )
 
 // GigamonoConfig ...
 type GigamonoConfig struct {
-	Meta    Meta `json:"meta"`
+	Meta   Meta `json:"meta"`
+	Broker struct {
+		URL           string `json:"url"`
+		Subscriptions struct {
+			Workspaces EnabledSubscription `json:"workspaces"`
+			Logs       EnabledSubscription `json:"logs"`
+		} `json:"subscriptions"`
+	} `json:"broker"`
 	Engines struct {
 		API struct {
-			Port  uint   `json:"port"`
-			DBURL string `json:"dbURL"`
+			Port         uint   `json:"port"`
+			DBURL        string `json:"dbURL"`
+			ReplyTimeout uint   `json:"replyTimeout: 10"`
 		} `json:"api"`
+		Backend struct {
+			RootPath      string `json:"rootPath"`
+			Subscriptions struct {
+				Workspaces struct {
+					Run EngineSubscription `json:"run"`
+				} `json:"workspaces"`
+			} `json:"subscriptions"`
+		} `json:"backend"`
+		DB struct {
+			DBURL         string `json:"dbURL"`
+			Subscriptions struct {
+				Workspaces struct {
+					Query EngineSubscription `json:"query"`
+				} `json:"workspaces"`
+			} `json:"subscriptions"`
+		} `json:"db"`
 	} `json:"engines"`
 	UI struct {
 		Dir string `json:"dir"`
 	} `json:"ui"`
-	Broker struct {
-		URL           string `json:"url"`
-		Subscriptions struct {
-			Workspaces Subscription `json:"workspaces"`
-			Logs       Subscription `json:"logs"`
-		} `json:"subscriptions"`
-	} `json:"broker"`
 	Logs struct {
 		File        string `json:"file"`
 		IsPublished string `json:"isPublished"`
 	} `json:"logs"`
 }
 
-type Subscription struct {
+type EnabledSubscription struct {
 	Version uint `json:"version"`
 }
 
+type EngineSubscription struct {
+	SubscribedID string `json:"subscribedId"`
+}
+
 // NewGigamonoConfig ...
-func NewGigamonoConfig(gigamonoString string, format ConfigFormat) (GigamonoConfig, error) {
-	// TODO: Sec: Validation
+func NewGigamonoConfig(configBytes []byte, format ConfigFormat) (GigamonoConfig, error) {
 	config := GigamonoConfig{}
-	reader := strings.NewReader(gigamonoString)
-
-	// Set format to parse.
-	converter := viper.New()
-	converter.SetConfigType(string(format))
-	converter.ReadConfig(reader)
-
-	// Unmarshal string into object.
-	if err := converter.Unmarshal(&config); err != nil {
-		return GigamonoConfig{}, err
+	if err := UnmarshalConfig(configBytes, format, &config); err != nil {
+		return config, err
 	}
 
 	return config, nil
@@ -81,5 +90,5 @@ func LoadGigamonoConfig() (GigamonoConfig, error) {
 		return GigamonoConfig{}, err
 	}
 
-	return NewGigamonoConfig(string(fileContent), format)
+	return NewGigamonoConfig(fileContent, format)
 }
