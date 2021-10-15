@@ -89,7 +89,7 @@ var (
 		Code:    304,
 	}
 	UnableToRunIndexScriptSuccessfully = ErrorMessage{
-		Message: "unable to run all index script successfully",
+		Message: "unable to run index script successfully",
 		Code:    305,
 	}
 	UnableToAuthenticate = ErrorMessage{

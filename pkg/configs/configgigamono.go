@@ -5,13 +5,16 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/creasty/defaults"
 )
 
 // GigamonoConfig ...
 type GigamonoConfig struct {
 	Meta   Meta `json:"meta"`
 	Broker struct {
-		URL           string `json:"url"`
+		URL           string `json:"url" default:"nats://127.0.0.1:4222"`
 		Subscriptions struct {
 			Workspaces EnabledSubscription `json:"workspaces"`
 			Logs       EnabledSubscription `json:"logs"`
@@ -21,13 +24,13 @@ type GigamonoConfig struct {
 		API struct {
 			Port         uint   `json:"port"`
 			DBURL        string `json:"dbURL"`
-			ReplyTimeout uint   `json:"replyTimeout: 10"`
+			ReplyTimeout uint   `json:"replyTimeout" default:"1"`
 		} `json:"api"`
 		Backend struct {
 			RootPath      string `json:"rootPath"`
 			Subscriptions struct {
 				Workspaces struct {
-					Run EngineSubscription `json:"run"`
+					Run EngineSubscription `json:"run" default:"1"`
 				} `json:"workspaces"`
 			} `json:"subscriptions"`
 		} `json:"backend"`
@@ -54,14 +57,25 @@ type EnabledSubscription struct {
 }
 
 type EngineSubscription struct {
-	SubscribedID string `json:"subscribedId"`
+	SubscribedID string `json:"subscribedId" default:"*"`
 }
 
 // NewGigamonoConfig ...
 func NewGigamonoConfig(configBytes []byte, format ConfigFormat) (GigamonoConfig, error) {
 	config := GigamonoConfig{}
+
 	if err := UnmarshalConfig(configBytes, format, &config); err != nil {
 		return config, err
+	}
+
+	// Set defaults.
+	if err := defaults.Set(&config); err != nil {
+		return config, err
+	}
+
+	// Validate config type.
+	if strings.ToLower(config.Meta.Type) != "gigamono" {
+		return config, GetWrongTypeError("Gigamono")
 	}
 
 	return config, nil

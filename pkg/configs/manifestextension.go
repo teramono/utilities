@@ -3,28 +3,30 @@ package configs
 import (
 	"strings"
 
-	"github.com/spf13/viper"
+	"github.com/creasty/defaults"
 )
 
 // ExtensionManifest ...
 type ExtensionManifest struct {
-	Meta            Meta     `json:"meta"`
+	Meta Meta `json:"meta"`
 }
 
 // NewExtensionManifest ...
-func NewExtensionManifest(manifestString string, format ConfigFormat) (ExtensionManifest, error) {
-	// TODO: Sec: Validation
+func NewExtensionManifest(manifestBytes []byte, format ConfigFormat) (ExtensionManifest, error) {
 	manifest := ExtensionManifest{}
-	reader := strings.NewReader(manifestString)
 
-	// Set format to parse.
-	converter := viper.New()
-	converter.SetConfigType(string(format))
-	converter.ReadConfig(reader)
+	if err := UnmarshalConfig(manifestBytes, format, &manifest); err != nil {
+		return manifest, err
+	}
 
-	// Unmarshal string into object.
-	if err := converter.Unmarshal(&manifest); err != nil {
-		return ExtensionManifest{}, err
+	// Set defaults.
+	if err := defaults.Set(&manifest); err != nil {
+		return manifest, err
+	}
+
+	// Validate manifest type.
+	if strings.ToLower(manifest.Meta.Type) != "extension" {
+		return manifest, GetWrongTypeError("Extension")
 	}
 
 	return manifest, nil

@@ -2,6 +2,7 @@ package configs
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
@@ -21,4 +22,8 @@ func UnmarshalConfig(configBytes []byte, format ConfigFormat, obj interface{}) e
 	}
 
 	return nil
+}
+
+func GetWrongTypeError(configType string) error {
+	return fmt.Errorf("wrong type, expected `%s`", configType)
 }
